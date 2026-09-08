@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace FactoryLocator
@@ -81,6 +82,27 @@ namespace FactoryLocator
 			}
 		}
 
+		// FactoryLocator warnings are local UI state. Bypass multiplayer warning
+		// guards only for these entries, without unpatching ordinary game warnings.
+		[HarmonyReversePatch(HarmonyReversePatchType.Original)]
+		[HarmonyPatch(typeof(WarningSystem), nameof(WarningSystem.NewWarningData),
+			new Type[] { typeof(int), typeof(int), typeof(int) })]
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		internal static ref WarningData NewWarningDataOriginal(
+			WarningSystem instance, int factoryId, int objectId, int signalId)
+		{
+			throw new NotImplementedException("Harmony reverse patch was not initialized");
+		}
+
+		[HarmonyReversePatch(HarmonyReversePatchType.Original)]
+		[HarmonyPatch(typeof(WarningSystem), nameof(WarningSystem.RemoveWarningData),
+			new Type[] { typeof(int) })]
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		internal static void RemoveWarningDataOriginal(WarningSystem instance, int warningId)
+		{
+			throw new NotImplementedException("Harmony reverse patch was not initialized");
+		}
+
 
 		[HarmonyPostfix]
 		[HarmonyPatch(typeof(UIWarningWindow), nameof(UIWarningWindow._OnLateUpdate))]
@@ -139,7 +161,7 @@ namespace FactoryLocator
                 {
 					if ((warning.localPos -__instance.entityPool[id].pos).sqrMagnitude < 1.0f)
 					{
-						ws.RemoveWarningData(i);
+						RemoveWarningDataOriginal(ws, i);
 						Log.Debug($"Remove {i} on {planetId}");
 					}
 				}
@@ -167,7 +189,8 @@ namespace FactoryLocator
 					return;
 				}
 
-				ref WarningData warning = ref warningSystem.NewWarningData(
+				ref WarningData warning = ref NewWarningDataOriginal(
+					warningSystem,
 					INDEXUPPERBOND - warningDetailId,
 					0,
 					signalId
@@ -199,7 +222,7 @@ namespace FactoryLocator
 				if (warning.factoryId <= INDEXUPPERBOND)
 				{
 					if (warning.id == i)
-						warningSystem.RemoveWarningData(i);
+						RemoveWarningDataOriginal(warningSystem, i);
 					else
 						warning.SetEmpty();
 					count++;
@@ -221,7 +244,7 @@ namespace FactoryLocator
 					if (warning.id == i && warning.state > 0 && warning.signalId == signalId && warning.detailId1 == detailId)
 					{
 						if (warning.factoryId <= INDEXUPPERBOND)
-							ws.RemoveWarningData(i);
+							RemoveWarningDataOriginal(ws, i);
 					}
 				}
 			}

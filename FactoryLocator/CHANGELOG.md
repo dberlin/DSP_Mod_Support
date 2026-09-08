@@ -1,5 +1,9 @@
 ## DSP 0.10.34
 
+### Unreleased
+
+\- Bypass patched warning allocation/removal APIs for FactoryLocator query markers so multiplayer client guards do not block local creation or cleanup. Ordinary warning APIs remain patched.
+
 ### v1.3.13
 
 \- Repair corrupted warning recycle state before creating query warnings.

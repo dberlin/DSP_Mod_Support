@@ -68,6 +68,8 @@ The mod don't have to install on both host and client. Some behaviors will be di
 - Host : The temporary guiding warning will sync with clients.  
 - Client : Only loaded planets are searchable. When the mod window is opened, the warning icon will stop syncing with host temporarily.   
 
+FactoryLocator creates and removes its query markers through DSP's original warning APIs, bypassing multiplayer client guards for those calls only. Ordinary game warning calls remain subject to Nebula's patches. The headless regression harness exercises blocking Harmony prefixes against the game assemblies; an in-game Nebula host/client session is still needed to verify rendering and synchronization.
+
 Install [NebulaCompatibilityAssist](https://dsp.thunderstore.io/package/starfi5h/NebulaCompatibilityAssist/) to get full functionality for clients.  
 
 ### Acknowledgements
